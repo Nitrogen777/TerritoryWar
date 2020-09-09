@@ -33,20 +33,18 @@ def start(player1_is_ai, player2_is_ai):
 
 
 def state_score(state, player):
-    c = 0
     sum = 0
     valid_me = 0
     valid_them = 0
     for i in range(state.board.shape[0]):
         for j in range(state.board.shape[0]):
-            sum += state.board[i,j]
-            if abs(state.board[i,j]) < GameSettings.level_amount - 1:
-                c += GameSettings.level_amount - abs(state.board[i,j])
-            if valid(state, (i, j), player):
-                valid_me += 1
-            if valid(state, (i, j), -player):
-                valid_them += 1
-    return player * sum + c
+            if state.board[i, j] != GameSettings.block_sym:
+                sum += state.board[i,j]
+                if valid(state, (i, j), player):
+                    valid_me += 1
+                if valid(state, (i, j), -player):
+                    valid_them += 1
+    return player * sum + valid_me - valid_them // 2
 
 
 def calculate_change(state):
@@ -54,11 +52,11 @@ def calculate_change(state):
     for i in range(GameSettings.board_size[0]):
         for j in range(GameSettings.board_size[1]):
             if abs(state.board[i, j]) == GameSettings.level_amount:
-                grow_enviroment(board, (i, j))
+                grow_environment(board, (i, j))
     return State(board)
 
 
-def grow_enviroment(board, pos):
+def grow_environment(board, pos):
     sign = board[pos] // abs(board[pos])
 
     if pos[0] > 0:
