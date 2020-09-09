@@ -34,17 +34,11 @@ def start(player1_is_ai, player2_is_ai):
 
 def state_score(state, player):
     sum = 0
-    valid_me = 0
-    valid_them = 0
     for i in range(state.board.shape[0]):
         for j in range(state.board.shape[0]):
             if state.board[i, j] != GameSettings.block_sym:
                 sum += state.board[i,j]
-                if valid(state, (i, j), player):
-                    valid_me += 1
-                if valid(state, (i, j), -player):
-                    valid_them += 1
-    return player * sum + valid_me - valid_them // 2
+    return player * sum
 
 
 def calculate_change(state):
