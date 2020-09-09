@@ -166,6 +166,7 @@ class Player:
                                 GameSettings.current_state = add(GameSettings.current_state,
                                                                  pos_to_index(pygame.mouse.get_pos()), 1)
                                 gh.paint_state(GameSettings.current_state)
+                                over = True
                                 GameSettings.player2.move()
                         else:
                             if valid(GameSettings.current_state, pos_to_index(pygame.mouse.get_pos()), self.number):
