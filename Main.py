@@ -1,6 +1,7 @@
 import GraphicsHandler as gh
-from GameUtils import State, GameSettings, Player
+from GameUtils import GameSettings, Player
 import GameUtils
+
 
 GameUtils.start(False, True)
 

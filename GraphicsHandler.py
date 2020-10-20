@@ -4,37 +4,36 @@ from GameUtils import GameSettings as gs
 
 def init():
     pygame.init()
-    pygame.display.set_mode((gs.board_size[0] * gs.square_size, gs.board_size[1] * gs.square_size))
+    pygame.display.set_mode((gs.BOARD_SIZE * gs.SQUARE_SIZE, gs.BOARD_SIZE * gs.SQUARE_SIZE))
     pygame.display.get_surface().fill((0, 0, 0))
-    paint_state(gs.current_state)
-
+    pygame.font.init()
 
 def paint_state(state):
     surface = pygame.display.get_surface()
-    for i in range(state.board.shape[0]):
-        for j in range(state.board.shape[1]):
-            if state.board[i, j] == gs.block_sym:
+    for i in range(state.shape[0]):
+        for j in range(state.shape[1]):
+            if state[i, j] == gs.BLOCK_SYM:
                 pygame.draw.rect(surface, (255, 255, 255),
-                                 (j * gs.square_size, i * gs.square_size, gs.square_size,
-                                  gs.square_size))
-            elif state.board[i, j] > 0:
-                pygame.draw.rect(surface, (state.board[i, j] * gs.player1.color[0] // gs.level_amount,
-                                           state.board[i, j] * gs.player1.color[1] // gs.level_amount,
-                                           state.board[i, j] * gs.player1.color[2] // gs.level_amount),
-                                 (j * gs.square_size, i * gs.square_size, gs.square_size,
-                                  gs.square_size))
+                                 (j * gs.SQUARE_SIZE, i * gs.SQUARE_SIZE, gs.SQUARE_SIZE,
+                                  gs.SQUARE_SIZE))
+            elif state[i, j] > 0:
+                pygame.draw.rect(surface, (state[i, j] * gs.player1.color[0] // gs.LEVEL_AMOUNT,
+                                           state[i, j] * gs.player1.color[1] // gs.LEVEL_AMOUNT,
+                                           state[i, j] * gs.player1.color[2] // gs.LEVEL_AMOUNT),
+                                 (j * gs.SQUARE_SIZE, i * gs.SQUARE_SIZE, gs.SQUARE_SIZE,
+                                  gs.SQUARE_SIZE))
             else:
-                pygame.draw.rect(surface, (-state.board[i, j] * gs.player2.color[0] // gs.level_amount,
-                                           -state.board[i, j] * gs.player2.color[1] // gs.level_amount,
-                                           -state.board[i, j] * gs.player2.color[2] // gs.level_amount),
-                                 (j * gs.square_size, i * gs.square_size, gs.square_size,
-                                  gs.square_size))
+                pygame.draw.rect(surface, (-state[i, j] * gs.player2.color[0] // gs.LEVEL_AMOUNT,
+                                           -state[i, j] * gs.player2.color[1] // gs.LEVEL_AMOUNT,
+                                           -state[i, j] * gs.player2.color[2] // gs.LEVEL_AMOUNT),
+                                 (j * gs.SQUARE_SIZE, i * gs.SQUARE_SIZE, gs.SQUARE_SIZE,
+                                  gs.SQUARE_SIZE))
     pygame.display.flip()
 
 
 def paint_cursor(index):
     surface = pygame.display.get_surface()
-    current_color = surface.get_at((index[1] * gs.square_size, index[0] * gs.square_size))
+    current_color = surface.get_at((index[1] * gs.SQUARE_SIZE, index[0] * gs.SQUARE_SIZE))
     if current_color[0] + 50 > 255:
         r = 255
     else:
@@ -48,6 +47,6 @@ def paint_cursor(index):
     else:
         b = current_color[2] + 50
     pygame.draw.rect(surface, (r, g, b),
-                     (index[1] * gs.square_size, index[0] * gs.square_size, gs.square_size,
-                      gs.square_size))
+                     (index[1] * gs.SQUARE_SIZE, index[0] * gs.SQUARE_SIZE, gs.SQUARE_SIZE,
+                      gs.SQUARE_SIZE))
     pygame.display.flip()

@@ -5,106 +5,117 @@ from MiniMaxUtils import Tree
 import time
 
 
-class State:
-    def __init__(self, board):
-        self.board = board
-
-    def __repr__(self):
-        for a in self.board:
-            print(a)
-
-
 def pos_to_index(pos):
-    return pos[1] // GameSettings.square_size, pos[0] // GameSettings.square_size
+    return pos[1] // GameSettings.SQUARE_SIZE, pos[0] // GameSettings.SQUARE_SIZE
 
 
 def add(state, index, player):
-    board = np.copy(state.board)
-    board[index] = player * GameSettings.level_amount
-    return State(board)
+    # add a player's core tile to the board
+    # player 1 is represented with positive values while player 2 is represented with negative values
+    board = np.copy(state)
+    board[index] = player * GameSettings.LEVEL_AMOUNT
+    return board
 
 
 def start(player1_is_ai, player2_is_ai):
-    # temporary as fuck
+    # temporary
+    # TODO: add color chooser
     GameSettings.player1 = Player((225, 123, 240), player1_is_ai, 1)
     GameSettings.player2 = Player((240, 240, 123), player2_is_ai, -1)
     gh.init()
+    gh.paint_state(GameSettings.current_state)
     GameSettings.player1.move()
 
 
 def state_score(state, player):
     sum = 0
-    for i in range(state.board.shape[0]):
-        for j in range(state.board.shape[0]):
-            if state.board[i, j] != GameSettings.block_sym:
-                sum += state.board[i,j]
-    return player * sum
+    valid_me = 0
+    for i in range(state.shape[0]):
+        for j in range(state.shape[0]):
+            if state[i, j] != GameSettings.BLOCK_SYM:
+                sum += state[i, j]
+                if player * state[i, j] > 0:
+                    sum += state[i, j] * 2
+            if valid(state, (i, j), player):
+                valid_me += player * state[i, j]
+
+    return player * sum + valid_me
 
 
 def calculate_change(state):
-    board = np.copy(state.board)
-    for i in range(GameSettings.board_size[0]):
-        for j in range(GameSettings.board_size[1]):
-            if abs(state.board[i, j]) == GameSettings.level_amount:
+    # calculate the effects of all core tiles
+    board = np.copy(state)
+    for i in range(GameSettings.BOARD_SIZE):
+        for j in range(GameSettings.BOARD_SIZE):
+            if abs(state[i, j]) == GameSettings.LEVEL_AMOUNT:
                 grow_environment(board, (i, j))
-    return State(board)
+    return board
 
 
 def grow_environment(board, pos):
+    # calculate the effects of a core tile
     sign = board[pos] // abs(board[pos])
 
     if pos[0] > 0:
-        if board[pos[0] - 1, pos[1]] != GameSettings.block_sym:
-            if board[pos[0] - 1, pos[1]] * sign == -GameSettings.level_amount:
+        if board[pos[0] - 1, pos[1]] != GameSettings.BLOCK_SYM:
+            if board[pos[0] - 1, pos[1]] * sign == -GameSettings.LEVEL_AMOUNT:
                 board[pos[0], pos[1]] -= sign
-            if board[pos[0] - 1, pos[1]] * sign < GameSettings.level_amount:
+            if board[pos[0] - 1, pos[1]] * sign < GameSettings.LEVEL_AMOUNT:
                 board[pos[0] - 1, pos[1]] += sign
     if pos[1] > 0:
-        if board[pos[0], pos[1] - 1] != GameSettings.block_sym:
-            if board[pos[0], pos[1] - 1] * sign == -GameSettings.level_amount:
+        if board[pos[0], pos[1] - 1] != GameSettings.BLOCK_SYM:
+            if board[pos[0], pos[1] - 1] * sign == -GameSettings.LEVEL_AMOUNT:
                 board[pos[0], pos[1]] -= sign
-            if board[pos[0], pos[1] - 1] * sign < GameSettings.level_amount:
+            if board[pos[0], pos[1] - 1] * sign < GameSettings.LEVEL_AMOUNT:
                 board[pos[0], pos[1] - 1] += sign
-    if pos[0] < GameSettings.board_size[0] - 1:
-        if board[pos[0] + 1, pos[1]] != GameSettings.block_sym:
-            if board[pos[0] + 1, pos[1]] * sign == -GameSettings.level_amount:
+    if pos[0] < GameSettings.BOARD_SIZE - 1:
+        if board[pos[0] + 1, pos[1]] != GameSettings.BLOCK_SYM:
+            if board[pos[0] + 1, pos[1]] * sign == -GameSettings.LEVEL_AMOUNT:
                 board[pos[0], pos[1]] -= sign
-            if board[pos[0] + 1, pos[1]] * sign < GameSettings.level_amount:
+            if board[pos[0] + 1, pos[1]] * sign < GameSettings.LEVEL_AMOUNT:
                 board[pos[0] + 1, pos[1]] += sign
-    if pos[1] < GameSettings.board_size[1] - 1:
-        if board[pos[0], pos[1] + 1] != GameSettings.block_sym:
-            if board[pos[0], pos[1] + 1] * sign == -GameSettings.level_amount:
+    if pos[1] < GameSettings.BOARD_SIZE - 1:
+        if board[pos[0], pos[1] + 1] != GameSettings.BLOCK_SYM:
+            if board[pos[0], pos[1] + 1] * sign == -GameSettings.LEVEL_AMOUNT:
                 board[pos[0], pos[1]] -= sign
-            if board[pos[0], pos[1] + 1] * sign < GameSettings.level_amount:
+            if board[pos[0], pos[1] + 1] * sign < GameSettings.LEVEL_AMOUNT:
                 board[pos[0], pos[1] + 1] += sign
 
 
 def core_in_zone(state, index, player):
-    board = np.copy(state.board)
+    # check if a core tile is next to the given index
+
+    # no longer in use (deprecated)
+    board = np.copy(state)
     if index[0] > 0:
-        if board[index[0] - 1, index[1]] == player * GameSettings.level_amount:
+        if board[index[0] - 1, index[1]] == player * GameSettings.LEVEL_AMOUNT:
             return True
     if index[1] > 0:
-        if board[index[0], index[1] - 1] == player * GameSettings.level_amount:
+        if board[index[0], index[1] - 1] == player * GameSettings.LEVEL_AMOUNT:
             return True
-    if index[0] < GameSettings.board_size[0] - 1:
-        if board[index[0] + 1, index[1]] == player * GameSettings.level_amount:
+    if index[0] < GameSettings.BOARD_SIZE - 1:
+        if board[index[0] + 1, index[1]] == player * GameSettings.LEVEL_AMOUNT:
             return True
-    if index[1] < GameSettings.board_size[1] - 1:
-        if board[index[0], index[1] + 1] == player * GameSettings.level_amount:
+    if index[1] < GameSettings.BOARD_SIZE - 1:
+        if board[index[0], index[1] + 1] == player * GameSettings.LEVEL_AMOUNT:
             return True
 
 
 def valid(state, index, player):
-    board = np.copy(state.board)
-    return -GameSettings.level_amount + 1 < player * board[index] < GameSettings.level_amount and board[index] != GameSettings.block_sym
+    # check if a move is valid
+    if GameSettings.current_move == GameSettings.max_move:
+        return False
+    board = np.copy(state)
+    return -GameSettings.LEVEL_AMOUNT + 1 < player * board[index] < GameSettings.LEVEL_AMOUNT and board[
+        index] != GameSettings.BLOCK_SYM
 
 
 def check_game_over(state):
+    # check if the game is over (if one of the players can't make any valid moves)
     c1 = 0
     c2 = 0
-    for i in range(GameSettings.board_size[0]):
-        for j in range(GameSettings.board_size[1]):
+    for i in range(GameSettings.BOARD_SIZE):
+        for j in range(GameSettings.BOARD_SIZE):
             if valid(state, (i, j), 1):
                 c1 += 1
             if valid(state, (i, j), -1):
@@ -113,10 +124,11 @@ def check_game_over(state):
 
 
 def check_winner(state):
+    # check who won
     sum = 0
-    for arr in state.board:
+    for arr in state:
         for x in arr:
-            if x != GameSettings.block_sym:
+            if x != GameSettings.BLOCK_SYM:
                 sum += x
     if sum < 0:
         return -1
@@ -133,6 +145,7 @@ class Player:
         self.number = number
 
     def move(self):
+        GameSettings.current_move += 1
         time.sleep(0.25)
         GameSettings.current_state = calculate_change(GameSettings.current_state)
         gh.paint_state(GameSettings.current_state)
@@ -177,10 +190,10 @@ class Player:
                     current_pos = pos_to_index(pygame.mouse.get_pos())
         else:
             t = Tree(GameSettings.current_state, self.number)
-            t.calc_scores(GameSettings.ai_depth_amount, self.number)
+            t.calc_scores(GameSettings.AI_DEPTH, self.number)
             if len(t.sons) > 0:
                 move_state = t.max_son().state
-                GameSettings.current_state = State(np.copy(move_state.board))
+                GameSettings.current_state = np.copy(move_state)
                 gh.paint_state(GameSettings.current_state)
             if self.number == 1:
                 GameSettings.player2.move()
@@ -189,19 +202,23 @@ class Player:
 
 
 class GameSettings:
-    board_size = (5, 5)
-    square_size = 600 // board_size[0]
-    level_amount = 5
-    block_sym = 99
+    BOARD_SIZE = 5  # size of the board in tiles
+    SQUARE_SIZE = 600 // BOARD_SIZE  # size of each tile on the board
+    LEVEL_AMOUNT = 5  # amount of control levels every tile has
+    BLOCK_SYM = 99  # symbol for the center block
 
-    ai_depth_amount = 3
+    current_move = 0
+    max_move = 50
 
-    # temporary as fuck
+    AI_DEPTH = 4
+
+    # temporary
     player1 = None
     player2 = None
 
-    current_state = State(np.zeros(board_size))
-    current_state.board[0, board_size[1] - 1] = level_amount
-    current_state.board[board_size[0] - 1, 0] = -level_amount
-    if board_size[0] % 2 == 1:
-        current_state.board[board_size[0]//2, board_size[1]//2] = block_sym
+    current_state = np.zeros((BOARD_SIZE, BOARD_SIZE))
+    current_state[0, BOARD_SIZE - 1] = LEVEL_AMOUNT
+    current_state[BOARD_SIZE - 1, 0] = -LEVEL_AMOUNT
+    # if the board size is odd, add a center block
+    if BOARD_SIZE % 2 == 1:
+        current_state[BOARD_SIZE // 2, BOARD_SIZE // 2] = BLOCK_SYM
