@@ -17,11 +17,13 @@ def add(state, index, player):
     return board
 
 
-def start(player1_is_ai, player2_is_ai):
+def start(player1, player2):
     # temporary
     # TODO: add color chooser
-    GameSettings.player1 = Player((225, 123, 240), player1_is_ai, 1)
-    GameSettings.player2 = Player((240, 240, 123), player2_is_ai, -1)
+    player1.number = 1
+    player2.number = -1
+    GameSettings.player1 = player1
+    GameSettings.player2 = player2
     gh.init()
     gh.paint_state(GameSettings.current_state)
     GameSettings.player1.move()
@@ -139,10 +141,10 @@ def check_winner(state):
 
 
 class Player:
-    def __init__(self, color, computer, number):
+    def __init__(self, color, computer, ai_depth):
         self.color = color
         self.is_computer = computer
-        self.number = number
+        self.ai_depth = ai_depth
 
     def move(self):
         GameSettings.current_move += 1
@@ -190,7 +192,7 @@ class Player:
                     current_pos = pos_to_index(pygame.mouse.get_pos())
         else:
             t = Tree(GameSettings.current_state, self.number)
-            t.calc_scores(GameSettings.AI_DEPTH, self.number)
+            t.calc_scores(self.ai_depth, self.number)
             if len(t.sons) > 0:
                 move_state = t.max_son().state
                 GameSettings.current_state = np.copy(move_state)
@@ -210,7 +212,6 @@ class GameSettings:
     current_move = 0
     max_move = 50
 
-    AI_DEPTH = 4
 
     # temporary
     player1 = None
