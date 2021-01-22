@@ -6,7 +6,7 @@ import time
 
 
 def pos_to_index(pos):
-    return pos[1] // GameSettings.SQUARE_SIZE, pos[0] // GameSettings.SQUARE_SIZE
+    return (pos[1] - gh.INFO_SIZE) // GameSettings.SQUARE_SIZE, (pos[0] - gh.INFO_SIZE) // GameSettings.SQUARE_SIZE
 
 
 def add(state, index, player):
@@ -31,17 +31,14 @@ def start(player1, player2):
 
 def state_score(state, player):
     sum = 0
-    valid_me = 0
     for i in range(state.shape[0]):
         for j in range(state.shape[0]):
             if state[i, j] != GameSettings.BLOCK_SYM:
                 sum += state[i, j]
-                if player * state[i, j] > 0:
-                    sum += state[i, j] * 2
-            if valid(state, (i, j), player):
-                valid_me += player * state[i, j]
+                if state[i, j] * player > 0:
+                    sum += 1
 
-    return player * sum + valid_me
+    return player * sum
 
 
 def calculate_change(state):
@@ -125,6 +122,21 @@ def check_game_over(state):
     return c1 == 0 or c2 == 0
 
 
+def get_game_stats(state):
+    player1 = {}
+    player2 = {}
+    for i in range(GameSettings.LEVEL_AMOUNT, 0, -1):
+        player1[i] = 0
+        player2[i] = 0
+    for i in range(GameSettings.BOARD_SIZE):
+        for j in range(GameSettings.BOARD_SIZE):
+            if 0 < state[i, j] <= GameSettings.LEVEL_AMOUNT:
+                player1[state[i,j]] += 1
+            elif -GameSettings.LEVEL_AMOUNT <= state[i, j] < 0:
+                player2[-state[i,j]] += 1
+    return player1, player2
+
+
 def check_winner(state):
     # check who won
     sum = 0
@@ -152,16 +164,18 @@ class Player:
         GameSettings.current_state = calculate_change(GameSettings.current_state)
         gh.paint_state(GameSettings.current_state)
         if check_game_over(GameSettings.current_state):
-            print("Game Over")
             winner = check_winner(GameSettings.current_state)
             if winner == 1:
-                print("Player 1 wins")
+                gh.paint_winner(GameSettings.current_state, 1)
             elif winner == -1:
-                print("Player 2 wins")
+                gh.paint_winner(GameSettings.current_state, 2)
             else:
                 print("Tie")
-            pygame.quit()
-            exit(11)
+            while True:
+                for event in pygame.event.get():
+                    if event == pygame.QUIT:
+                        pygame.quit()
+                        exit(11)
         if not self.is_computer:
             over = False
             current_pos = pos_to_index(pygame.mouse.get_pos())
