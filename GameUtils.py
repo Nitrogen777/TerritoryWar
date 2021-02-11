@@ -36,9 +36,9 @@ def state_score(state, player):
             if state[i, j] != GameSettings.BLOCK_SYM:
                 sum += state[i, j]
                 if state[i, j] * player > 0:
-                    sum += 1
+                    sum += player
 
-    return player * sum
+    return int(player * sum)
 
 
 def calculate_change(state):
@@ -105,8 +105,8 @@ def valid(state, index, player):
     if GameSettings.current_move == GameSettings.max_move:
         return False
     board = np.copy(state)
-    return -GameSettings.LEVEL_AMOUNT + 1 < player * board[index] < GameSettings.LEVEL_AMOUNT and board[
-        index] != GameSettings.BLOCK_SYM
+    return -GameSettings.LEVEL_AMOUNT + 1 <= player * board[index] < GameSettings.LEVEL_AMOUNT and \
+           board[index] != GameSettings.BLOCK_SYM
 
 
 def check_game_over(state):
@@ -153,7 +153,7 @@ def check_winner(state):
 
 
 class Player:
-    def __init__(self, color, computer, ai_depth):
+    def __init__(self, color, computer, ai_depth=4):
         self.color = color
         self.is_computer = computer
         self.ai_depth = ai_depth
@@ -182,19 +182,14 @@ class Player:
             while not over:
                 for event in pygame.event.get():
                     if event.type == pygame.MOUSEBUTTONDOWN:
-                        if self.number == 1:
-                            if valid(GameSettings.current_state, pos_to_index(pygame.mouse.get_pos()), self.number):
-                                GameSettings.current_state = add(GameSettings.current_state,
-                                                                 pos_to_index(pygame.mouse.get_pos()), 1)
-                                gh.paint_state(GameSettings.current_state)
-                                over = True
+                        if valid(GameSettings.current_state, pos_to_index(pygame.mouse.get_pos()), self.number):
+                            GameSettings.current_state = add(GameSettings.current_state,
+                                                             pos_to_index(pygame.mouse.get_pos()), self.number)
+                            gh.paint_state(GameSettings.current_state)
+                            over = True
+                            if self.number == 1:
                                 GameSettings.player2.move()
-                        else:
-                            if valid(GameSettings.current_state, pos_to_index(pygame.mouse.get_pos()), self.number):
-                                GameSettings.current_state = add(GameSettings.current_state,
-                                                                 pos_to_index(pygame.mouse.get_pos()), -1)
-                                gh.paint_state(GameSettings.current_state)
-                                over = True
+                            else:
                                 GameSettings.player1.move()
                     if event.type == pygame.QUIT:
                         pygame.quit()
@@ -205,6 +200,7 @@ class Player:
                     gh.paint_cursor(pos_to_index(pygame.mouse.get_pos()))
                     current_pos = pos_to_index(pygame.mouse.get_pos())
         else:
+            gh.show_ai_thinking()
             t = Tree(GameSettings.current_state, self.number)
             t.calc_scores(self.ai_depth, self.number)
             if len(t.sons) > 0:
