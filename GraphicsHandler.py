@@ -18,7 +18,7 @@ def init():
     global ENDGAME_FONT
     FONT = pygame.font.SysFont('Helvetica', FONT_SIZE)
     SCORE_FONT = pygame.font.SysFont('Helvetica', SCORE_FONT_SIZE)
-    ENDGAME_FONT = pygame.font.SysFont('Helvetica', ENDGAME_FONT_SIZE)
+    ENDGAME_FONT = pygame.font.Font('hacker.ttf', ENDGAME_FONT_SIZE)
 
 
 def paint_state(state):
@@ -61,7 +61,7 @@ def paint_state(state):
 
 def show_ai_thinking():
     surface = pygame.display.get_surface()
-    ai_thinking = ENDGAME_FONT.render("The AI is Thinking", False, (255, 255, 255))
+    ai_thinking = ENDGAME_FONT.render("THE ai IS Thinking", False, (255, 255, 255))
     surface.blit(ai_thinking, ((600 + INFO_SIZE * 2) // 2 - ai_thinking.get_size()[0] // 2, 20))
     pygame.display.flip()
 
@@ -93,9 +93,9 @@ def paint_winner(state, winner):
     surface.blit(score_text1, (INFO_SIZE + 605, INFO_SIZE + FONT_SIZE * gs.LEVEL_AMOUNT + SCORE_FONT_SIZE))
     surface.blit(score_text2, (5, INFO_SIZE + 600 - FONT_SIZE * gs.LEVEL_AMOUNT - (FONT_SIZE + SCORE_FONT_SIZE)))
     if winner == 1:
-        endgame_text = ENDGAME_FONT.render("Player 1 Wins!", False, gs.player1.color)
+        endgame_text = ENDGAME_FONT.render("Player 1 Wins", False, gs.player1.color)
     elif winner == 2:
-        endgame_text = ENDGAME_FONT.render("Player 2 Wins!", False, gs.player2.color)
+        endgame_text = ENDGAME_FONT.render("Player 2 Wins", False, gs.player2.color)
     surface.blit(endgame_text, ((600 + INFO_SIZE*2)//2 - endgame_text.get_size()[0]//2, 20))
     pygame.display.flip()
 

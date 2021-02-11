@@ -26,6 +26,8 @@ def start(player1, player2):
     GameSettings.player2 = player2
     gh.init()
     gh.paint_state(GameSettings.current_state)
+    pygame.mixer_music.load("music.mp3")
+    pygame.mixer_music.play(0)
     GameSettings.player1.move()
 
 
@@ -171,6 +173,8 @@ class Player:
                 gh.paint_winner(GameSettings.current_state, 2)
             else:
                 print("Tie")
+            pygame.mixer_music.load("buzz.mp3")
+            pygame.mixer_music.play(0)
             while True:
                 for event in pygame.event.get():
                     if event == pygame.QUIT:
