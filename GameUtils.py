@@ -186,15 +186,17 @@ class Player:
             while not over:
                 for event in pygame.event.get():
                     if event.type == pygame.MOUSEBUTTONDOWN:
-                        if valid(GameSettings.current_state, pos_to_index(pygame.mouse.get_pos()), self.number):
-                            GameSettings.current_state = add(GameSettings.current_state,
-                                                             pos_to_index(pygame.mouse.get_pos()), self.number)
-                            gh.paint_state(GameSettings.current_state)
-                            over = True
-                            if self.number == 1:
-                                GameSettings.player2.move()
-                            else:
-                                GameSettings.player1.move()
+                        if gh.INFO_SIZE < pygame.mouse.get_pos()[0] < gh.INFO_SIZE+ 600 and \
+                                gh.INFO_SIZE < pygame.mouse.get_pos()[1] < gh.INFO_SIZE + 600:
+                            if valid(GameSettings.current_state, pos_to_index(pygame.mouse.get_pos()), self.number):
+                                GameSettings.current_state = add(GameSettings.current_state,
+                                                                 pos_to_index(pygame.mouse.get_pos()), self.number)
+                                gh.paint_state(GameSettings.current_state)
+                                over = True
+                                if self.number == 1:
+                                    GameSettings.player2.move()
+                                else:
+                                    GameSettings.player1.move()
                     if event.type == pygame.QUIT:
                         pygame.quit()
                         exit(11)
