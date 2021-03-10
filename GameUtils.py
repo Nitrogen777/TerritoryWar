@@ -6,6 +6,7 @@ import time
 
 
 def pos_to_index(pos):
+    # Convert the mouse's position to a board index
     return (pos[1] - gh.INFO_SIZE) // GameSettings.SQUARE_SIZE, (pos[0] - gh.INFO_SIZE) // GameSettings.SQUARE_SIZE
 
 
@@ -18,8 +19,7 @@ def add(state, index, player):
 
 
 def start(player1, player2):
-    # temporary
-    # TODO: add color chooser
+    # Start the game, set the players as the game's players and init pygame
     player1.number = 1
     player2.number = -1
     GameSettings.player1 = player1
@@ -32,6 +32,7 @@ def start(player1, player2):
 
 
 def state_score(state, player):
+    # Calculate the AI score for a given game state
     sum = 0
     for i in range(state.shape[0]):
         for j in range(state.shape[0]):
@@ -83,25 +84,6 @@ def grow_environment(board, pos):
                 board[pos[0], pos[1] + 1] += sign
 
 
-def core_in_zone(state, index, player):
-    # check if a core tile is next to the given index
-
-    # no longer in use (deprecated)
-    board = np.copy(state)
-    if index[0] > 0:
-        if board[index[0] - 1, index[1]] == player * GameSettings.LEVEL_AMOUNT:
-            return True
-    if index[1] > 0:
-        if board[index[0], index[1] - 1] == player * GameSettings.LEVEL_AMOUNT:
-            return True
-    if index[0] < GameSettings.BOARD_SIZE - 1:
-        if board[index[0] + 1, index[1]] == player * GameSettings.LEVEL_AMOUNT:
-            return True
-    if index[1] < GameSettings.BOARD_SIZE - 1:
-        if board[index[0], index[1] + 1] == player * GameSettings.LEVEL_AMOUNT:
-            return True
-
-
 def valid(state, index, player):
     # check if a move is valid
     if GameSettings.current_move == GameSettings.max_move:
@@ -125,6 +107,7 @@ def check_game_over(state):
 
 
 def get_game_stats(state):
+    # Get game stats like score and amount of controlled tiles
     player1 = {}
     player2 = {}
     for i in range(GameSettings.LEVEL_AMOUNT, 0, -1):
@@ -161,10 +144,12 @@ class Player:
         self.ai_depth = ai_depth
 
     def move(self):
+        # Execute the player's move
         GameSettings.current_move += 1
         time.sleep(0.25)
         GameSettings.current_state = calculate_change(GameSettings.current_state)
         gh.paint_state(GameSettings.current_state)
+        # First check if the game is over
         if check_game_over(GameSettings.current_state):
             winner = check_winner(GameSettings.current_state)
             if winner == 1:
@@ -180,11 +165,13 @@ class Player:
                     if event.type == pygame.QUIT:
                         pygame.quit()
                         exit(11)
+        # Check if the player is a human
         if not self.is_computer:
             over = False
             current_pos = pos_to_index(pygame.mouse.get_pos())
             while not over:
                 for event in pygame.event.get():
+                    # Get where the player clicked
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         if gh.INFO_SIZE < pygame.mouse.get_pos()[0] < gh.INFO_SIZE+ 600 and \
                                 gh.INFO_SIZE < pygame.mouse.get_pos()[1] < gh.INFO_SIZE + 600:
@@ -193,6 +180,7 @@ class Player:
                                                                  pos_to_index(pygame.mouse.get_pos()), self.number)
                                 gh.paint_state(GameSettings.current_state)
                                 over = True
+                                # Execute the other player's move
                                 if self.number == 1:
                                     GameSettings.player2.move()
                                 else:
@@ -206,13 +194,16 @@ class Player:
                     gh.paint_cursor(pos_to_index(pygame.mouse.get_pos()))
                     current_pos = pos_to_index(pygame.mouse.get_pos())
         else:
+            # Display "THE AI IS THINKING"
             gh.show_ai_thinking()
+            # Minimax algorithm
             t = Tree(GameSettings.current_state, self.number)
             t.calc_scores(self.ai_depth, self.number)
             if len(t.sons) > 0:
                 move_state = t.max_son().state
                 GameSettings.current_state = np.copy(move_state)
                 gh.paint_state(GameSettings.current_state)
+            # Execute the other player's move
             if self.number == 1:
                 GameSettings.player2.move()
             else:

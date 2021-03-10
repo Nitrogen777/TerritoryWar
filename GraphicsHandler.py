@@ -8,6 +8,8 @@ SCORE_FONT_SIZE = 20
 ENDGAME_FONT_SIZE = 64
 BACKGROUND = (0, 14, 28)
 
+
+# Initiate pygame
 def init():
     pygame.init()
     pygame.display.set_mode((600 + INFO_SIZE * 2, 600 + INFO_SIZE))
@@ -21,6 +23,7 @@ def init():
     ENDGAME_FONT = pygame.font.Font('hacker.ttf', ENDGAME_FONT_SIZE)
 
 
+# Paint a given state of the board
 def paint_state(state):
     surface = pygame.display.get_surface()
     surface.fill(BACKGROUND)
@@ -59,6 +62,7 @@ def paint_state(state):
     pygame.display.flip()
 
 
+# Display "THE AI IS THINKING" while minimax is calculating
 def show_ai_thinking():
     surface = pygame.display.get_surface()
     ai_thinking = ENDGAME_FONT.render("THE ai IS Thinking", False, (255, 255, 255))
@@ -66,6 +70,7 @@ def show_ai_thinking():
     pygame.display.flip()
 
 
+# Paint the end-of-game "Winner" state
 def paint_winner(state, winner):
     surface = pygame.display.get_surface()
     surface.fill(BACKGROUND)
@@ -100,6 +105,7 @@ def paint_winner(state, winner):
     pygame.display.flip()
 
 
+# Brighten up the place where the cursor is located
 def paint_cursor(index):
     if index[1] < 0 or index[0] < 0 or index[1] >= gs.BOARD_SIZE:
         return

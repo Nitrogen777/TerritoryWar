@@ -7,6 +7,7 @@ class Tree:
         self.score = 0
         self.player = player
 
+    # Calculate the scores
     def calc_scores(self, depth, player):
         if depth != 0:
             next_state = gu.calculate_change(self.state)
@@ -27,6 +28,7 @@ class Tree:
         else:
             self.score = gu.state_score(self.state, self.player)
 
+    # Return the maximum tree out of an array of trees
     def max_son(self):
         max = self.sons[0].score
         maxson = self.sons[0]
@@ -36,6 +38,7 @@ class Tree:
                 maxson = son
         return maxson
 
+    # Return the minimum tree out of an array of trees
     def min_son(self):
         min = self.sons[0].score
         minson = self.sons[0]
