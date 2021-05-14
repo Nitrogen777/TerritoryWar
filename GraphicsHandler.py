@@ -9,11 +9,14 @@ ENDGAME_FONT_SIZE = 64
 BACKGROUND = (0, 14, 28)
 
 
-# Initiate pygame
 def init():
+    """
+    Initiate the graphics for the game.
+    """
     pygame.init()
     pygame.display.set_mode((600 + INFO_SIZE * 2, 600 + INFO_SIZE))
     pygame.display.get_surface().fill((0, 0, 0))
+    pygame.display.set_caption("Territory War")
     pygame.font.init()
     global FONT
     global SCORE_FONT
@@ -23,8 +26,11 @@ def init():
     ENDGAME_FONT = pygame.font.Font('hacker.ttf', ENDGAME_FONT_SIZE)
 
 
-# Paint a given state of the board
 def paint_state(state):
+    """
+    Paint a given game state on the screen, including game stats.
+    :param state: The game state.
+    """
     surface = pygame.display.get_surface()
     surface.fill(BACKGROUND)
     pygame.draw.rect(surface, (255, 255, 255), (INFO_SIZE-1, INFO_SIZE-1, 602, 601))
@@ -62,16 +68,23 @@ def paint_state(state):
     pygame.display.flip()
 
 
-# Display "THE AI IS THINKING" while minimax is calculating
 def show_ai_thinking():
+    """
+    Display "The AI is thinking" on the screen for a better user experience.
+    """
     surface = pygame.display.get_surface()
     ai_thinking = ENDGAME_FONT.render("THE ai IS Thinking", False, (255, 255, 255))
     surface.blit(ai_thinking, ((600 + INFO_SIZE * 2) // 2 - ai_thinking.get_size()[0] // 2, 20))
     pygame.display.flip()
 
 
-# Paint the end-of-game "Winner" state
 def paint_winner(state, winner):
+    """
+    Paint the state at which the game ended.
+    :param state: The game state.
+    :param winner: The winner. 1 for player 1, 2 for player 2 and 0 for tie
+    :return:
+    """
     surface = pygame.display.get_surface()
     surface.fill(BACKGROUND)
     pygame.draw.rect(surface, (255, 255, 255), (INFO_SIZE-1, INFO_SIZE-1, 602, 601))
@@ -101,12 +114,17 @@ def paint_winner(state, winner):
         endgame_text = ENDGAME_FONT.render("Player 1 Wins", False, gs.player1.color)
     elif winner == 2:
         endgame_text = ENDGAME_FONT.render("Player 2 Wins", False, gs.player2.color)
+    elif winner == 0:
+        endgame_text = ENDGAME_FONT.render("Its a TIE", False, (255, 255, 255))
     surface.blit(endgame_text, ((600 + INFO_SIZE*2)//2 - endgame_text.get_size()[0]//2, 20))
     pygame.display.flip()
 
 
-# Brighten up the place where the cursor is located
 def paint_cursor(index):
+    """
+    Brighten up a specific portion of the board.
+    :param index: The board index to brighten up.
+    """
     if index[1] < 0 or index[0] < 0 or index[1] >= gs.BOARD_SIZE:
         return
     surface = pygame.display.get_surface()

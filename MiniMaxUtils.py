@@ -7,8 +7,12 @@ class Tree:
         self.score = 0
         self.player = player
 
-    # Calculate the scores
     def calc_scores(self, depth, player):
+        """
+        Calculate the scores for all future turns using the minimax algorithm.
+        :param depth: How many turns in advance to calculate (More turns = Slower game performance).
+        :param player: The "max" player.
+        """
         if depth != 0:
             next_state = gu.calculate_change(self.state)
             for i in range(next_state.shape[0]):
@@ -28,8 +32,10 @@ class Tree:
         else:
             self.score = gu.state_score(self.state, self.player)
 
-    # Return the maximum tree out of an array of trees
     def max_son(self):
+        """
+        :return: The tree with the highest score out of an array of trees
+        """
         max = self.sons[0].score
         maxson = self.sons[0]
         for son in self.sons:
@@ -38,8 +44,10 @@ class Tree:
                 maxson = son
         return maxson
 
-    # Return the minimum tree out of an array of trees
     def min_son(self):
+        """
+        :return: The tree with the lowest score out of an array of trees
+        """
         min = self.sons[0].score
         minson = self.sons[0]
         for son in self.sons:
@@ -49,7 +57,16 @@ class Tree:
         return minson
 
     def add_son(self, state):
+        """
+        Add a son to the tree
+        :param state: The state that the son represents
+        """
         self.sons.append(Tree(state, self.player))
 
     def get_son(self, index):
+        """
+        Get a son at a specific array index.
+        :param index: The index where the array is located.
+        :return: The son at the index.
+        """
         return self.sons[index]

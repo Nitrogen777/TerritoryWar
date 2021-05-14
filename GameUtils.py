@@ -6,20 +6,33 @@ import time
 
 
 def pos_to_index(pos):
-    # Convert the mouse's position to a board index
+    """
+    A function that converts an x,y pixel position to an index on a board.
+    :param pos: A x,y pixel position on the screen.
+    :return: A index representing the location of the tile on a board.
+    """
     return (pos[1] - gh.INFO_SIZE) // GameSettings.SQUARE_SIZE, (pos[0] - gh.INFO_SIZE) // GameSettings.SQUARE_SIZE
 
 
 def add(state, index, player):
-    # add a player's core tile to the board
-    # player 1 is represented with positive values while player 2 is represented with negative values
+    """
+    Adds a player's core tile (a tile with the maximum control level) to the board.
+    :param state: The board that the core tile is being added to.
+    :param index: The index where the core tile is being added.
+    :param player: The number representing the player (Player 1 is represented with 1, Player 2 is represented with -1)
+    :return: The new board, with the core tile added.
+    """
     board = np.copy(state)
     board[index] = player * GameSettings.LEVEL_AMOUNT
     return board
 
 
 def start(player1, player2):
-    # Start the game, set the players as the game's players and init pygame
+    """
+    Starts a new game with 2 customizable players.
+    :param player1: Player 1 (The 1 player).
+    :param player2: Player 2 (The -1 player).
+    """
     player1.number = 1
     player2.number = -1
     GameSettings.player1 = player1
@@ -32,7 +45,15 @@ def start(player1, player2):
 
 
 def state_score(state, player):
-    # Calculate the AI score for a given game state
+    """
+    Calculate the score of a given game state for a specific player.
+    The score is calculated by summing all the levels of the tiles that the player controls,
+    subtracting the levels of the tiles the enemy player controls, (since enemy levels are negative to the player level,
+    we are essentially summing the whole board), and adding 1 for every tile controlled by the player
+    :param state: The game state for which we are calculating the score.
+    :param player: The player we are calculating the score for.
+    :return: The score of the game state.
+    """
     sum = 0
     for i in range(state.shape[0]):
         for j in range(state.shape[0]):
@@ -45,7 +66,11 @@ def state_score(state, player):
 
 
 def calculate_change(state):
-    # calculate the effects of all core tiles
+    """
+    Calculate all the changes made to a game state as a result of the core tiles expanding.
+    :param state: The state where the changes are performed.
+    :return: The new state with the changes performed.
+    """
     board = np.copy(state)
     for i in range(GameSettings.BOARD_SIZE):
         for j in range(GameSettings.BOARD_SIZE):
@@ -55,7 +80,11 @@ def calculate_change(state):
 
 
 def grow_environment(board, pos):
-    # calculate the effects of a core tile
+    """
+    Expand the environment of a single core tile.
+    :param board: The board where the changes are being performed.
+    :param pos: The position where the core tile is located.
+    """
     sign = board[pos] // abs(board[pos])
 
     if pos[0] > 0:
@@ -85,7 +114,13 @@ def grow_environment(board, pos):
 
 
 def valid(state, index, player):
-    # check if a move is valid
+    """
+    Check if playing a core tile in a specific location is a valid move.
+    :param state: The game board.
+    :param index: The location being checked.
+    :param player: The player performing the move.
+    :return: True if the move is valid, False otherwise.
+    """
     if GameSettings.current_move == GameSettings.max_move:
         return False
     board = np.copy(state)
@@ -94,7 +129,11 @@ def valid(state, index, player):
 
 
 def check_game_over(state):
-    # check if the game is over (if one of the players can't make any valid moves)
+    """
+    Check if the game is over (if a player can't make any valid moves).
+    :param state: The game state.
+    :return: True if the game is over, False otherwise.
+    """
     c1 = 0
     c2 = 0
     for i in range(GameSettings.BOARD_SIZE):
@@ -107,7 +146,13 @@ def check_game_over(state):
 
 
 def get_game_stats(state):
-    # Get game stats like score and amount of controlled tiles
+    """
+    Get a dictionary of the amounts of tiles in each level. Mostly used for graphics.
+    :param state: The game state.
+    :return: A tuple with 2 dictionaries, 1 for each player. Each dictionary holes the amount of tiles in
+    a specific level, with the key being the level. For example, player1[5] returns the amount of Level 5 tiles
+    controlled by player 1.
+    """
     player1 = {}
     player2 = {}
     for i in range(GameSettings.LEVEL_AMOUNT, 0, -1):
@@ -123,7 +168,11 @@ def get_game_stats(state):
 
 
 def check_winner(state):
-    # check who won
+    """
+    Checks which player 1.
+    :param state: The game state.
+    :return: 1 if player 1 won, -1 if player 2 won and 0 if its a tie.
+    """
     sum = 0
     for arr in state:
         for x in arr:
@@ -144,7 +193,9 @@ class Player:
         self.ai_depth = ai_depth
 
     def move(self):
-        # Execute the player's move
+        """
+        Execute the player's move.
+        """
         GameSettings.current_move += 1
         time.sleep(0.25)
         GameSettings.current_state = calculate_change(GameSettings.current_state)
@@ -157,7 +208,7 @@ class Player:
             elif winner == -1:
                 gh.paint_winner(GameSettings.current_state, 2)
             else:
-                print("Tie")
+                gh.paint_winner(GameSettings.current_state, 0)
             pygame.mixer_music.load("buzz.mp3")
             pygame.mixer_music.play(0)
             while True:
