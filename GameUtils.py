@@ -72,9 +72,14 @@ def calculate_change(state):
     :return: The new state with the changes performed.
     """
     board = np.copy(state)
+    existing_cores = []  # recording all already existing cores, so newly created cores don't grow their own environment
     for i in range(GameSettings.BOARD_SIZE):
         for j in range(GameSettings.BOARD_SIZE):
             if abs(board[i, j]) == GameSettings.LEVEL_AMOUNT:
+                existing_cores.append((i,j))
+    for i in range(GameSettings.BOARD_SIZE):
+        for j in range(GameSettings.BOARD_SIZE):
+            if abs(board[i, j]) == GameSettings.LEVEL_AMOUNT and (i,j) in existing_cores:
                 grow_environment(board, (i, j))
     return board
 

@@ -123,11 +123,24 @@ def paint_winner(state, winner):
 def paint_cursor(index):
     """
     Brighten up a specific portion of the board.
+    Also display the level number in the top right.
     :param index: The board index to brighten up.
     """
     if index[1] < 0 or index[0] < 0 or index[1] >= gs.BOARD_SIZE:
         return
+    if gs.current_state[index[0],index[1]] > 0 and gs.current_state[index[0], index[1]] != gs.BLOCK_SYM:
+        color = gs.player1.color
+    elif gs.current_state[index[0],index[1]] < 0:
+        color = gs.player2.color
+    else:
+        color = (255,255,255)
+
+    level_text = ENDGAME_FONT.render("{}".format(int(abs(gs.current_state[index[0],index[1]]))), False, color)
+    level_surf = pygame.Surface(level_text.get_size())
+    level_surf.fill(BACKGROUND)
+    level_surf.blit(level_text, (0,0))
     surface = pygame.display.get_surface()
+    surface.blit(level_surf, (600 + INFO_SIZE*2-level_surf.get_size()[0],0))
     current_color = surface.get_at((index[1] * gs.SQUARE_SIZE + INFO_SIZE, index[0] * gs.SQUARE_SIZE + INFO_SIZE))
     if current_color[0] + 50 > 255:
         r = 255
