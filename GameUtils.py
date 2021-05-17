@@ -74,7 +74,7 @@ def calculate_change(state):
     board = np.copy(state)
     for i in range(GameSettings.BOARD_SIZE):
         for j in range(GameSettings.BOARD_SIZE):
-            if abs(state[i, j]) == GameSettings.LEVEL_AMOUNT:
+            if abs(board[i, j]) == GameSettings.LEVEL_AMOUNT:
                 grow_environment(board, (i, j))
     return board
 
