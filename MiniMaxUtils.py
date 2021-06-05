@@ -1,11 +1,15 @@
+"""
+This file includes classes and methods used by the AI player's algorithm.
+"""
 import GameUtils as gu
+
 
 class Tree:
     def __init__(self, state, player):
-        self.sons = []
-        self.state = state
-        self.score = 0
-        self.player = player
+        self._sons = []
+        self._state = state
+        self._score = 0
+        self._player = player
 
     def calc_scores(self, depth, player):
         """
@@ -14,33 +18,33 @@ class Tree:
         :param player: The "max" player.
         """
         if depth != 0:
-            next_state = gu.calculate_change(self.state)
+            next_state = gu.calculate_change(self._state)
             for i in range(next_state.shape[0]):
                 for j in range(next_state.shape[1]):
                     if gu.valid(next_state, (i,j), player):
                         self.add_son(gu.add(next_state, (i,j), player))
-            if len(self.sons) > 0:
-                for son in self.sons:
+            if len(self._sons) > 0:
+                for son in self._sons:
                     son.calc_scores(depth - 1, -player)
-                if player == self.player:
-                    self.score = self.max_son().score
+                if player == self._player:
+                    self._score = self.max_son()._score
                 else:
-                    self.score = self.min_son().score
+                    self._score = self.min_son()._score
             else:
-                self.score = gu.state_score(self.state, self.player)
+                self._score = gu.state_score(self._state, self._player)
 
         else:
-            self.score = gu.state_score(self.state, self.player)
+            self._score = gu.state_score(self._state, self._player)
 
     def max_son(self):
         """
         :return: The tree with the highest score out of an array of trees
         """
-        max = self.sons[0].score
-        maxson = self.sons[0]
-        for son in self.sons:
-            if son.score > max:
-                max = son.score
+        max = self._sons[0]._score
+        maxson = self._sons[0]
+        for son in self._sons:
+            if son._score > max:
+                max = son._score
                 maxson = son
         return maxson
 
@@ -48,11 +52,11 @@ class Tree:
         """
         :return: The tree with the lowest score out of an array of trees
         """
-        min = self.sons[0].score
-        minson = self.sons[0]
-        for son in self.sons:
-            if son.score < min:
-                min = son.score
+        min = self._sons[0]._score
+        minson = self._sons[0]
+        for son in self._sons:
+            if son._score < min:
+                min = son._score
                 minson = son
         return minson
 
@@ -61,7 +65,7 @@ class Tree:
         Add a son to the tree
         :param state: The state that the son represents
         """
-        self.sons.append(Tree(state, self.player))
+        self._sons.append(Tree(state, self._player))
 
     def get_son(self, index):
         """
@@ -69,4 +73,4 @@ class Tree:
         :param index: The index where the array is located.
         :return: The son at the index.
         """
-        return self.sons[index]
+        return self._sons[index]

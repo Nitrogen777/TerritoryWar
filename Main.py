@@ -1,3 +1,6 @@
+"""
+The main file, used to run the game.
+"""
 import GraphicsHandler
 from GameUtils import Player
 import GameUtils

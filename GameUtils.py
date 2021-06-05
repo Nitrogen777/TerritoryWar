@@ -1,3 +1,7 @@
+"""
+This file includes classes and methods mainly used in calculations for the game.
+"""
+
 import numpy as np
 import GraphicsHandler as gh
 import pygame
@@ -33,8 +37,8 @@ def start(player1, player2):
     :param player1: Player 1 (The 1 player).
     :param player2: Player 2 (The -1 player).
     """
-    player1.number = 1
-    player2.number = -1
+    player1._number = 1
+    player2._number = -1
     GameSettings.player1 = player1
     GameSettings.player2 = player2
     gh.init()
@@ -126,7 +130,7 @@ def valid(state, index, player):
     :param player: The player performing the move.
     :return: True if the move is valid, False otherwise.
     """
-    if GameSettings.current_move == GameSettings.max_move:
+    if GameSettings.current_move == GameSettings.MAX_MOVE:
         return False
     board = np.copy(state)
     return -GameSettings.LEVEL_AMOUNT + 1 <= player * board[index] < GameSettings.LEVEL_AMOUNT and \
@@ -192,10 +196,14 @@ def check_winner(state):
 
 
 class Player:
+    """
+    Class of objects that represent the players of the game.
+    """
     def __init__(self, color, computer, ai_depth=4):
-        self.color = color
-        self.is_computer = computer
-        self.ai_depth = ai_depth
+        self._color = color
+        self._is_computer = computer
+        self._ai_depth = ai_depth
+        self._number = 0
 
     def move(self):
         """
@@ -222,7 +230,7 @@ class Player:
                         pygame.quit()
                         exit(11)
         # Check if the player is a human
-        if not self.is_computer:
+        if not self._is_computer:
             over = False
             current_pos = pos_to_index(pygame.mouse.get_pos())
             while not over:
@@ -231,13 +239,13 @@ class Player:
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         if gh.INFO_SIZE < pygame.mouse.get_pos()[0] < gh.INFO_SIZE+ 600 and \
                                 gh.INFO_SIZE < pygame.mouse.get_pos()[1] < gh.INFO_SIZE + 600:
-                            if valid(GameSettings.current_state, pos_to_index(pygame.mouse.get_pos()), self.number):
+                            if valid(GameSettings.current_state, pos_to_index(pygame.mouse.get_pos()), self._number):
                                 GameSettings.current_state = add(GameSettings.current_state,
-                                                                 pos_to_index(pygame.mouse.get_pos()), self.number)
+                                                                 pos_to_index(pygame.mouse.get_pos()), self._number)
                                 gh.paint_state(GameSettings.current_state)
                                 over = True
                                 # Execute the other player's move
-                                if self.number == 1:
+                                if self._number == 1:
                                     GameSettings.player2.move()
                                 else:
                                     GameSettings.player1.move()
@@ -253,27 +261,30 @@ class Player:
             # Display "THE AI IS THINKING"
             gh.show_ai_thinking()
             # Minimax algorithm
-            t = Tree(GameSettings.current_state, self.number)
-            t.calc_scores(self.ai_depth, self.number)
-            if len(t.sons) > 0:
-                move_state = t.max_son().state
+            t = Tree(GameSettings.current_state, self._number)
+            t.calc_scores(self._ai_depth, self._number)
+            if len(t._sons) > 0:
+                move_state = t.max_son()._state
                 GameSettings.current_state = np.copy(move_state)
                 gh.paint_state(GameSettings.current_state)
             # Execute the other player's move
-            if self.number == 1:
+            if self._number == 1:
                 GameSettings.player2.move()
             else:
                 GameSettings.player1.move()
 
 
 class GameSettings:
+    """
+    Global settings for the game.
+    """
     BOARD_SIZE = 5  # size of the board in tiles
     SQUARE_SIZE = 600 // BOARD_SIZE  # size of each tile on the board
     LEVEL_AMOUNT = 5  # amount of control levels every tile has
     BLOCK_SYM = 99  # symbol for the center block
 
     current_move = 0
-    max_move = 50
+    MAX_MOVE = 50
 
 
     # temporary
