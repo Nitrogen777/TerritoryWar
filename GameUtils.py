@@ -197,7 +197,7 @@ class Player:
     """
     Class of objects that represent the players of the game.
     """
-    def __init__(self, color, computer, ai_depth=4):
+    def __init__(self, color, computer, ai_depth=3):
         self._color = color
         self._is_computer = computer
         self._ai_depth = ai_depth
