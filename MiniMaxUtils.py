@@ -5,6 +5,9 @@ import GameUtils as gu
 
 
 class Tree:
+    """
+    A class of tree nodes used for Minimax calculations.
+    """
     def __init__(self, state, player):
         self._sons = []
         self._state = state
